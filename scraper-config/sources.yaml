@@ -1,0 +1,62 @@
+version: 1
+defaults:
+  enabled: false
+  allowed_by_policy: false
+  auth_required: false
+  crawl_budget:
+    max_pages_per_run: 25
+    max_depth: 2
+  rate_limit:
+    requests_per_minute: 20
+    jitter_ms: [300, 1200]
+  retries:
+    max_attempts: 3
+    backoff_seconds: [2, 5, 10]
+
+sources:
+  - id: pr_newswire
+    display_name: PR Newswire
+    domain: prnewswire.com
+    enabled: true
+    allowed_by_policy: true
+    auth_required: false
+    extractor: prnewswire_feed
+    seed_urls:
+      - https://www.prnewswire.com/news-releases/news-releases-list/
+    robots_checked_at: 2026-03-23
+    tos_reviewed_at: 2026-03-23
+
+  - id: muck_rack
+    display_name: Muck Rack
+    domain: muckrack.com
+    enabled: false
+    allowed_by_policy: false
+    auth_required: true
+    extractor: muckrack_company
+    seed_urls:
+      - https://muckrack.com/
+    cookie_profile: muck_rack_default
+    robots_checked_at: null
+    tos_reviewed_at: null
+
+notion_sync:
+  enabled: true
+  mode: bidirectional_allowlist
+  inbound_editable_fields:
+    - pipeline_stage
+    - notes
+    - primary_icp
+  conflict_policy:
+    strategy: manual_review_for_high_risk
+    low_risk_fields_last_write_wins:
+      - pipeline_stage
+      - notes
+      - primary_icp
+    high_risk_fields_require_review:
+      - company_name
+      - website
+      - canonical_domain
+      - fit_score
+      - intent_score
+      - total_score
+

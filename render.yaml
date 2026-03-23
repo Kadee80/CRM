@@ -1,0 +1,64 @@
+services:
+  - type: web
+    name: crm-api
+    env: docker
+    dockerfilePath: ./backend/Dockerfile.api
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: JOB_WORKER_POLL_SECONDS
+        value: "10"
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_JWKS_URL
+        sync: false
+      - key: SUPABASE_JWT_AUDIENCE
+        sync: false
+      - key: SUPABASE_JWT_ISSUER
+        sync: false
+      - key: NOTION_API_TOKEN
+        sync: false
+      - key: NOTION_DATABASE_ID
+        sync: false
+      - key: NOTION_SYNC_MODE
+        value: bidirectional_allowlist
+      - key: NOTION_WEBHOOK_SIGNING_SECRET
+        sync: false
+
+  - type: worker
+    name: crm-worker
+    env: docker
+    dockerfilePath: ./backend/Dockerfile.worker
+    autoDeploy: true
+    startCommand: python -m app.workers.job_worker
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: JOB_WORKER_POLL_SECONDS
+        value: "10"
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_JWKS_URL
+        sync: false
+      - key: SUPABASE_JWT_AUDIENCE
+        sync: false
+      - key: SUPABASE_JWT_ISSUER
+        sync: false
+      - key: NOTION_API_TOKEN
+        sync: false
+      - key: NOTION_DATABASE_ID
+        sync: false
+      - key: NOTION_SYNC_MODE
+        value: bidirectional_allowlist
+      - key: NOTION_WEBHOOK_SIGNING_SECRET
+        sync: false

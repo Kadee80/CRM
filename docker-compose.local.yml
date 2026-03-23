@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: crm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - crm_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d crm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.api
+    environment:
+      APP_ENV: development
+      LOG_LEVEL: debug
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/crm
+      NOTION_WEBHOOK_SIGNING_SECRET: local-dev-secret
+      JOB_WORKER_POLL_SECONDS: 10
+      LOCAL_AUTH_BYPASS: "true"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 10000 --reload
+    volumes:
+      - ./backend:/app
+    ports:
+      - "10000:10000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.worker
+    environment:
+      APP_ENV: development
+      LOG_LEVEL: debug
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/crm
+      NOTION_WEBHOOK_SIGNING_SECRET: local-dev-secret
+      JOB_WORKER_POLL_SECONDS: 5
+      LOCAL_AUTH_BYPASS: "true"
+    command: python -m app.workers.job_worker
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  crm_pg_data:
