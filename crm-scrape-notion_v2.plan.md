@@ -38,7 +38,7 @@ flowchart LR
   SW --> PG
 
   Q --> NW[Notion Sync Worker]
-  NW --> N[Notion Database (Projection/UI)]
+  NW --> N[Notion Database - Projection UI]
   NW --> PG
 ```
 
