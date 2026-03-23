@@ -10,6 +10,7 @@ COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY backend /app
+COPY scraper-config /app/scraper-config
 
 # Run as a non-root user for safer defaults.
 RUN useradd --create-home --shell /usr/sbin/nologin appuser && chown -R appuser:appuser /app

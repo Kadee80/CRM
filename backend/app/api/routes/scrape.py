@@ -1,9 +1,7 @@
-from pathlib import Path
-
-import yaml
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.auth.supabase import RequestContext, require_context
+from app.scrape.config import get_source_config
 from app.storage.db import get_conn
 
 
@@ -77,12 +75,8 @@ def validate_source_session(
 
 
 def _get_source(source_id: str) -> dict:
-  root = Path(__file__).resolve().parents[4]
-  path = root / "scraper-config" / "sources.yaml"
-  data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-  sources = data.get("sources", [])
-  for src in sources:
-    if src.get("id") == source_id:
-      return src
-  raise HTTPException(status_code=404, detail=f"Unknown source: {source_id}")
+  try:
+    return get_source_config(source_id)
+  except KeyError:
+    raise HTTPException(status_code=404, detail=f"Unknown source: {source_id}") from None
 

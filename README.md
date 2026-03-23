@@ -7,6 +7,8 @@ This project uses:
 - Background worker for queue processing
 - Notion as projection/secondary UI
 
+Track implemented features and how to test them in `FEATURE_TRACKER.md`.
+
 ## Prerequisites
 
 - Python 3.11+
@@ -188,10 +190,48 @@ Invoke-RestMethod -Method Post `
 - `GET /notion/sync/status`
 - `POST /notion/webhook/notion-update`
 
+## Run a scrape (PR Newswire)
+
+Requires the **worker** container/service running (it executes queued `scrape_runs`).
+
+1) Queue a run:
+
+```powershell
+Invoke-RestMethod -Method Post `
+  -Uri "http://localhost:10000/scrape/runs?source=pr_newswire" `
+  -Headers @{
+    "Authorization" = "Bearer local-dev"
+    "X-Workspace-Id" = "11111111-1111-1111-1111-111111111111"
+  }
+```
+
+2) Poll status:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://localhost:10000/scrape/runs/<run_id>" `
+  -Headers @{
+    "Authorization" = "Bearer local-dev"
+    "X-Workspace-Id" = "11111111-1111-1111-1111-111111111111"
+  }
+```
+
+3) List ingested prospects:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://localhost:10000/prospects" `
+  -Headers @{
+    "Authorization" = "Bearer local-dev"
+    "X-Workspace-Id" = "11111111-1111-1111-1111-111111111111"
+  }
+```
+
 ## Current implementation scope
 
 - Route and worker scaffolding are implemented.
 - Queue processing is wired for `from_notion` allowlisted fields.
 - `to_notion` worker path is implemented and updates/creates Notion pages.
 - Conflict records are persisted for non-allowlisted Notion inbound fields.
+- PR Newswire listing scrape (`prnewswire_feed`) writes `source_records` and upserts `prospects` by canonical domain.
 

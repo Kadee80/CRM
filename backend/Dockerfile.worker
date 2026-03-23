@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 RUN pip install --no-cache-dir playwright && playwright install --with-deps chromium
 
 COPY backend /app
+COPY scraper-config /app/scraper-config
 
 # Keep worker image separate from API image so browser deps stay isolated.
 
