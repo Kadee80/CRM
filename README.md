@@ -43,6 +43,15 @@ docker compose -f docker-compose.local.yml exec api python -m app.storage.seed_d
 Invoke-RestMethod http://localhost:10000/health
 ```
 
+### Preview the API (browser)
+
+With the API running on port `10000`, open:
+
+- **Swagger UI (interactive):** [http://localhost:10000/docs](http://localhost:10000/docs)
+- **ReDoc (reference docs):** [http://localhost:10000/redoc](http://localhost:10000/redoc)
+
+Use these to browse routes and try requests from the browser.
+
 ### 5) Verify Playwright in worker image (optional)
 
 ```powershell
@@ -108,6 +117,8 @@ python -m app.storage.seed_dev
 uvicorn app.main:app --host 0.0.0.0 --port 10000 --reload
 ```
 
+Then preview the API in the browser: [http://localhost:10000/docs](http://localhost:10000/docs) (Swagger) or [http://localhost:10000/redoc](http://localhost:10000/redoc) (ReDoc).
+
 ### 7) Run worker (new terminal, same venv/env)
 
 ```powershell
@@ -170,6 +181,7 @@ Invoke-RestMethod -Method Post `
 
 ## Useful endpoints
 
+- `GET /docs` (Swagger UI) and `GET /redoc` (ReDoc) for API preview
 - `GET /health`
 - `GET /prospects`
 - `POST /scrape/runs?source=pr_newswire`
